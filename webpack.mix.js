@@ -11,10 +11,11 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.js(path.resolve('src/app.js'), path.resolve('dist/'))
+mix.js('src/app.js', 'dist/')
     .scripts([
-        path.resolve('node_modules/phaser/dist/phaser.min.js')
-    ], path.resolve('dist/phaser.js'));
+        'node_modules/phaser/dist/phaser.min.js'
+    ], 'dist/phaser.js')
+    .setPublicPath('./');
 
 // Full API
 // mix.js(src, output);
