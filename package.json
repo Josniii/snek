@@ -4,7 +4,7 @@
   "description": "HTML5 SNEK",
   "main": "index.html",
   "scripts": {
-    "dev": "./node_modules/http-server/bin/http-server"
+    "dev": "node ./node_modules/http-server/bin/http-server"
   },
   "repository": {
     "type": "git",
