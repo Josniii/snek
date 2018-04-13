@@ -1,0 +1,23 @@
+{
+  "name": "snek",
+  "version": "1.0.0",
+  "description": "HTML5 SNEK",
+  "main": "index.html",
+  "scripts": {
+    "dev": "http-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Josniii/snek.git"
+  },
+  "keywords": [
+    "HTML5",
+    "JavaScript",
+    "Snake"
+  ],
+  "author": "Jonas Søndergaard, Jesper Kielsgaard, Simeon Dahl",
+  "bugs": {
+    "url": "https://github.com/Josniii/snek/issues"
+  },
+  "homepage": "https://github.com/Josniii/snek#readme"
+}
