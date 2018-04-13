@@ -1,1 +1,4 @@
+### BUILD FILES AND PACKAGES
 node_modules
+dist
+mix-manifest.json
