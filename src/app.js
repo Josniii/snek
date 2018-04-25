@@ -3,7 +3,9 @@ import Fruit from "./fruit";
 import { config, xGridSize, yGridSize } from "./config";
 
 let snake;
+let snake_;
 let controls;
+let Wkey, Akey, Skey, Dkey;
 let fruit;
 let fruitsEaten = 0;
 
@@ -23,9 +25,14 @@ function preload ()
 
 function create () 
 {
-    snake = new Snake(8, 8, this);
+    snake = new Snake(8, 8, this);   
+    snake_ = new Snake(20, 20, this);
     fruit = new Fruit(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this);
-    controls = this.input.keyboard.createCursorKeys();
+    controls = this.input.keyboard.createCursorKeys();  
+    Wkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+    Akey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    Skey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+    Dkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 }
 
 function update (time) 
@@ -40,9 +47,27 @@ function update (time)
         snake.goDown();
     }
 
+    if(Akey.isDown) {
+        snake_.goLeft();
+    } else if(Dkey.isDown) {
+        snake_.goRight();
+    } else if(Wkey.isDown) {
+        snake_.goUp();
+    } else if(Skey.isDown) {
+        snake_.goDown();
+    }
+
+    
+
     snake.update(time);
+    snake_.update(time);
     if(snake.isEatingFruit(fruit)) {
         snake.addBodyPart();
+        fruit.destroy();
+        fruit = new Fruit(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this);
+    }    
+    if(snake_.isEatingFruit(fruit)) {
+        snake_.addBodyPart();
         fruit.destroy();
         fruit = new Fruit(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this);
     }
