@@ -18,11 +18,14 @@ export default Phaser.Class({
         this.tailPos = new Phaser.Geom.Point(x, y);
 
         //Setting up attributes that control the speed and direction of the snake
+        this.minTimeBetweenMoves = 0;
         this.timeBetweenMoves = 100;
         this.timeToNextMove = 1000;
+        this.fruitsBetweenSpeedIncrease = 5;
         this.direction = directions.RIGHT;
         this.hasChangedDirection = false;
 
+        this.bodyPartsAdded = 0;
         this.alive = true;
     },
 
@@ -35,16 +38,16 @@ export default Phaser.Class({
     move: function(time) {
         switch(this.direction) {
             case (directions.LEFT):
-                this.headPos.x -= 1;
+                this.headPos.x = Phaser.Math.Wrap(this.headPos.x - 1, 0, 40);
                 break;
             case (directions.RIGHT):
-                this.headPos.x += 1;
+                this.headPos.x = Phaser.Math.Wrap(this.headPos.x + 1, 0, 40);
                 break;
             case (directions.UP):
-                this.headPos.y -= 1;
+                this.headPos.y = Phaser.Math.Wrap(this.headPos.y - 1, 0, 40);
                 break;
             case (directions.DOWN):
-                this.headPos.y += 1;
+                this.headPos.y = Phaser.Math.Wrap(this.headPos.y + 1, 0, 40);
                 break;
         }
 
@@ -92,4 +95,23 @@ export default Phaser.Class({
             this.hasChangedDirection = true;
         }
     },
+
+    increaseSpeed: function() {
+        if(this.timeBetweenMoves > this.minTimeBetweenMoves) {
+            this.timeBetweenMoves -= 10;
+        }
+    },
+
+    addBodyPart: function() {
+        let part = this.body.create(this.tailPos.x, this.tailPos.y, 'snake');
+        part.setOrigin(0);
+        this.bodyPartsAdded++;
+        if(this.bodyPartsAdded % this.fruitsBetweenSpeedIncrease === 0) {
+            this.increaseSpeed();
+        }
+    },
+
+    isEatingFruit: function(fruit) {
+        return this.head.x === fruit.x && this.head.y === fruit.y;
+    }
 })
