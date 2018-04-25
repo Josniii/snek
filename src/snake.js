@@ -1,5 +1,5 @@
 import directions from "./directions";
-import config from './config';
+import { xGridSize, yGridSize, gridScaling, config } from './config';
 
 export default Phaser.Class({
 
@@ -7,12 +7,12 @@ export default Phaser.Class({
 
     function Snake(x, y, scene) {
 
-        this.xMax = config.width;
-        this.yMax = config.height;
+        this.xMax = xGridSize;
+        this.yMax = yGridSize;
 
         //Setting up the body and the head.
         this.body = scene.add.group();
-        this.head = this.body.create(x * 20, y * 20, 'snake');
+        this.head = this.body.create(x * gridScaling, y * gridScaling, 'snake');
         this.head.setOrigin(0);
         this.headPos = new Phaser.Geom.Point(x, y);
         this.tailPos = new Phaser.Geom.Point(x, y);
@@ -38,31 +38,22 @@ export default Phaser.Class({
     move: function(time) {
         switch(this.direction) {
             case (directions.LEFT):
-                this.headPos.x = Phaser.Math.Wrap(this.headPos.x - 1, 0, 40);
+                this.headPos.x = Phaser.Math.Wrap(this.headPos.x - 1, 0, this.xMax);
                 break;
             case (directions.RIGHT):
-                this.headPos.x = Phaser.Math.Wrap(this.headPos.x + 1, 0, 40);
+                this.headPos.x = Phaser.Math.Wrap(this.headPos.x + 1, 0, this.xMax);
                 break;
             case (directions.UP):
-                this.headPos.y = Phaser.Math.Wrap(this.headPos.y - 1, 0, 40);
+                this.headPos.y = Phaser.Math.Wrap(this.headPos.y - 1, 0, this.yMax);
                 break;
             case (directions.DOWN):
-                this.headPos.y = Phaser.Math.Wrap(this.headPos.y + 1, 0, 40);
+                this.headPos.y = Phaser.Math.Wrap(this.headPos.y + 1, 0, this.yMax);
                 break;
         }
 
-        //TODO: Death handling, should be moved to a seperate function probably?
-        if(
-            this.head.x >= this.xMax ||
-            this.head.y >= this.yMax ||
-            this.head.x < 0 ||
-            this.head.y < 0
-        ) {
-            this.alive = false;
-            console.log("u ded");
-        }
+        Phaser.Actions.ShiftPosition(this.body.getChildren(), this.headPos.x * gridScaling, this.headPos.y * gridScaling, 1, this.tailPos);
 
-        Phaser.Actions.ShiftPosition(this.body.getChildren(), this.headPos.x * 20, this.headPos.y * 20, 1, this.tailPos);
+        this.checkIsAlive();
 
         this.hasChangedDirection = false;
         this.timeToNextMove += this.timeBetweenMoves;
@@ -93,6 +84,18 @@ export default Phaser.Class({
         if((this.direction === directions.LEFT || this.direction === directions.RIGHT) && !this.hasChangedDirection ) {
             this.direction = directions.DOWN;
             this.hasChangedDirection = true;
+        }
+    },
+
+    checkIsAlive: function() {
+        //Boundary collision check - will not be used if the game has wraparound enabled.
+        let hasCollidedWithBoundary = this.headPos.x > this.xMax - 1 || this.headPos.y > this.yMax - 1 || this.headPos.x < 0 || this.headPos.y < 0
+        let hasCollidedWithBody = Phaser.Actions.GetFirst(this.body.getChildren(), {
+            x: this.head.x,
+            y: this.head.y
+        }, 1);
+        if(hasCollidedWithBoundary || hasCollidedWithBody) {
+            this.alive = false;
         }
     },
 

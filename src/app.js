@@ -1,12 +1,12 @@
 import Snake from "./snake";
 import Fruit from "./fruit";
-import config from "./config";
+import { config, xGridSize, yGridSize } from "./config";
 
 let snake;
 let controls;
 let fruit;
 let fruitsEaten = 0;
-var apples, apple, snake_x_text, apple_x_text;
+
 config.scene = {
     preload: preload,
     create: create,
@@ -24,7 +24,7 @@ function preload ()
 function create () 
 {
     snake = new Snake(8, 8, this);
-    fruit = new Fruit(Phaser.Math.Between(0, 39), Phaser.Math.Between(0, 39), this);
+    fruit = new Fruit(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this);
     controls = this.input.keyboard.createCursorKeys();
 }
 
@@ -44,6 +44,6 @@ function update (time)
     if(snake.isEatingFruit(fruit)) {
         snake.addBodyPart();
         fruit.destroy();
-        fruit = new Fruit(Phaser.Math.Between(0, 39), Phaser.Math.Between(0, 39), this);
+        fruit = new Fruit(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this);
     }
 }

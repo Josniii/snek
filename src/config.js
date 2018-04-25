@@ -1,7 +1,11 @@
-export default {
+export let xGridSize = 40;
+export let yGridSize = 40;
+export let gridScaling = 20;
+
+export let config = {
     type: Phaser.AUTO,
-    width: 40*20,
-    height: 40*20,
+    width: xGridSize*gridScaling,
+    height: yGridSize*gridScaling,
     physics: {
         default: 'arcade',
         arcade: {
