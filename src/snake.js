@@ -5,14 +5,15 @@ export default Phaser.Class({
 
     initialize:
 
-    function Snake(x, y, scene) {
+    function Snake(x, y, scene, player) {
 
         this.xMax = xGridSize;
         this.yMax = yGridSize;
 
         //Setting up the body and the head.
         this.body = scene.add.group();
-        this.head = this.body.create(x * gridScaling, y * gridScaling, 'snake');
+        if(player == "one"){ this.head = this.body.create(x * gridScaling, y * gridScaling, 'snakeOne'); }
+        else if(player == "two") { this.head = this.body.create(x * gridScaling, y * gridScaling, 'snakeTwo'); }
         this.head.setOrigin(0);
         this.headPos = new Phaser.Geom.Point(x, y);
         this.tailPos = new Phaser.Geom.Point(x, y);
@@ -30,6 +31,11 @@ export default Phaser.Class({
     },
 
     update: function(time) {
+        // JK - was testing a function (removebodypart)
+        if(this.alive == false)
+        {
+            this.alive = true;
+        }
         if(time >= this.timeToNextMove) {
             this.move(time);
         }
@@ -94,6 +100,7 @@ export default Phaser.Class({
             x: this.head.x,
             y: this.head.y
         }, 1);
+
         if(hasCollidedWithBoundary || hasCollidedWithBody) {
             this.alive = false;
         }
@@ -105,8 +112,10 @@ export default Phaser.Class({
         }
     },
 
-    addBodyPart: function() {
-        let part = this.body.create(this.tailPos.x, this.tailPos.y, 'snake');
+    addBodyPart: function(player) {
+        let part;
+        if(player == 'one'){ part = this.body.create(this.tailPos.x, this.tailPos.y, 'snakeOne'); }
+        if(player == 'two'){ part = this.body.create(this.tailPos.x, this.tailPos.y, 'snakeTwo'); }
         part.setOrigin(0);
         this.bodyPartsAdded++;
         if(this.bodyPartsAdded % this.fruitsBetweenSpeedIncrease === 0) {
