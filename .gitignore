@@ -1,4 +1,6 @@
 ### BUILD FILES AND PACKAGES
 node_modules
 dist
+release-builds
 mix-manifest.json
+.DS_Store
