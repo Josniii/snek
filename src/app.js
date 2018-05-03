@@ -13,18 +13,43 @@ config.scene = {
     create: create,
     update: update,
 }
-var game = new Phaser.Game(config);
+let game = new Phaser.Game(config);
 
 function preload ()
 {
     this.load.image('map', 'assets/map.png');
-    this.load.image('snakeOne', 'assets/snakeOne.png');
-    this.load.image('snakeTwo', 'assets/snakeTwo.png');
     this.load.image('fruit', 'assets/apple.png');
 }
 
 function create () 
 {
+    let snake = [
+        '.11111111.',
+        '1111111111',
+        '1111111111',
+        '1111111111',
+        '1111111111',
+        '1111111111',
+        '1111111111',
+        '1111111111',
+        '1111111111',
+        '.11111111.'
+    ];
+    let snakeOne = snake.slice();
+    let snakeTwo = snake.slice();
+
+    //Modify the colors of the snakes here
+    let snakeOneColor = 'D';
+    let snakeTwoColor = '7';
+
+    snake.forEach((line, index) => {
+        //Replace the '1's in the pixelmap with the corresponding colors
+        snakeOne[index] = line.replace(/1/g, snakeOneColor);
+        snakeTwo[index] = line.replace(/1/g, snakeTwoColor);
+    })
+    this.textures.generate('snakeOne', { data: snakeOne, pixelWidth: 2});
+    this.textures.generate('snakeTwo', { data: snakeTwo, pixelWidth: 2});
+
     snakePlayerOne = new Snake(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this, 'one');   
     snakePlayerTwo = new Snake(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this, 'two');
     fruit = new Fruit(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this);
@@ -58,8 +83,6 @@ function update (time)
     } else if(this.wasdControls.Skey.isDown) {
         snakePlayerTwo.goDown();
     }
-
-    
 
     snakePlayerOne.update(time);
     if(snakePlayerOne.isEatingFruit(fruit)) {
