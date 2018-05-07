@@ -42,12 +42,13 @@ function create ()
     let snakeColors = ['D', '7', 'A', '3'];
 
     let params = getParams(location.search);
-    let colors = params.colors.split(',');
-
-    //Override snake colors with parameter colors
-    colors.forEach((color, index) => {
-        snakeColors[index] = color;
-    })
+    if(params.colors !== undefined) {
+        let colors = params.colors.split(',');
+        //Override snake colors with parameter colors
+        colors.forEach((color, index) => {
+            snakeColors[index] = color;
+        })
+    }
 
     snake.forEach((line, index) => {
         //Replace the '1's in the pixelmap with the corresponding colors
