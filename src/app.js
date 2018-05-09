@@ -2,9 +2,8 @@ import Snake from "./snake";
 import Fruit from "./fruit";
 import { config, xGridSize, yGridSize } from "./config";
 
-let snakePlayerOne, snakePlayerTwo;
+let snakes = [];
 let controls;
-let wasdControls, Wkey, Akey, Skey, Dkey;
 let fruit;
 let fruitsEaten = 0;
 
@@ -23,7 +22,8 @@ function preload ()
 
 function create () 
 {
-    let snake = [
+    let params = getParams(location.search);
+    let snakeBitmap = [
         '.11111111.',
         '1111111111',
         '1111111111',
@@ -35,13 +35,17 @@ function create ()
         '1111111111',
         '.11111111.'
     ];
-    let snakeOne = snake.slice();
-    let snakeTwo = snake.slice();
-
-    //initialize with some default colors
+    
+    let snakeBitmaps = [];
+    if(params.players > 1 && params.players < 5) {
+        for(let i = 0; i < params.players; i++) {
+            snakeBitmaps[i] = snakeBitmap.slice();
+        }
+    } else {
+        snakeBitmaps[0] = snakeBitmap.slice();
+    }
+    //initialize with some default colors for the snakes
     let snakeColors = ['D', '7', 'A', '3'];
-
-    let params = getParams(location.search);
     if(params.colors !== undefined) {
         let colors = params.colors.split(',');
         //Override snake colors with parameter colors
@@ -50,61 +54,72 @@ function create ()
         })
     }
 
-    snake.forEach((line, index) => {
+    snakeBitmap.forEach((line, index) => {
         //Replace the '1's in the pixelmap with the corresponding colors
-        snakeOne[index] = line.replace(/1/g, snakeColors[0]);
-        snakeTwo[index] = line.replace(/1/g, snakeColors[1]);
-    })
-    this.textures.generate('snakeOne', { data: snakeOne, pixelWidth: 2});
-    this.textures.generate('snakeTwo', { data: snakeTwo, pixelWidth: 2});
+        for(let i = 0; i < snakeBitmaps.length; i++) {
+            snakeBitmaps[i][index] = line.replace(/1/g, snakeColors[i]);
+        }
+    });
 
-    snakePlayerOne = new Snake(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this, 'one');   
-    snakePlayerTwo = new Snake(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this, 'two');
-    fruit = new Fruit(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this);
-    controls = this.input.keyboard.createCursorKeys();  
-    this.wasdControls = {
-        Wkey : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-        Akey : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-        Skey : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-        Dkey : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+    for(let i = 0; i < snakeBitmaps.length; i++) {
+        this.textures.generate(`snake${i}`, { data: snakeBitmaps[i], pixelWidth: 2});
+        snakes[i] = new Snake(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this, i);
     }
+
+    this.fruit = new Fruit(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this);
+    let keyboardControls = this.input.keyboard.createCursorKeys();  
+    let wasdControls = {
+        up : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+        left : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+        down : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+        right : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+    };
+    let tfghControls = {
+        up : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.T),
+        left : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F),
+        down : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G),
+        right : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.H)
+    };
+    let ijklControls = {
+        up : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I),
+        left : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J),
+        down : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K),
+        right : this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.L)
+    };
+    this.controls = [keyboardControls, wasdControls, tfghControls, ijklControls];
 }
 
 function update (time) 
 {
-    if(controls.left.isDown) {
-        snakePlayerOne.goLeft();
-    } else if(controls.right.isDown) {
-        snakePlayerOne.goRight();
-    } else if(controls.up.isDown) {
-        snakePlayerOne.goUp();
-    } else if(controls.down.isDown) {
-        snakePlayerOne.goDown();
-    }
+    let self = this;
+    this.controls.forEach((controller, index) => {
+        if(controller.left.isDown) {
+            if(snakes[index]) {
+                snakes[index].goLeft();
+            }
+        } else if(controller.right.isDown) {
+            if(snakes[index]) {
+                snakes[index].goRight();
+            }
+        } else if(controller.up.isDown) {
+            if(snakes[index]) {
+                snakes[index].goUp();
+            }
+        } else if(controller.down.isDown) {
+            if(snakes[index]) {
+                snakes[index].goDown();
+            }
+        }
+    });
 
-    if(this.wasdControls.Akey.isDown) {
-        snakePlayerTwo.goLeft();
-    } else if(this.wasdControls.Dkey.isDown) {
-        snakePlayerTwo.goRight();
-    } else if(this.wasdControls.Wkey.isDown) {
-        snakePlayerTwo.goUp();
-    } else if(this.wasdControls.Skey.isDown) {
-        snakePlayerTwo.goDown();
-    }
-
-    snakePlayerOne.update(time);
-    if(snakePlayerOne.isEatingFruit(fruit)) {
-        snakePlayerOne.addBodyPart('one');
-        fruit.destroy();
-        fruit = new Fruit(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this);
-    }
-
-    snakePlayerTwo.update(time);    
-    if(snakePlayerTwo.isEatingFruit(fruit)) {
-        snakePlayerTwo.addBodyPart('two');
-        fruit.destroy();
-        fruit = new Fruit(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this);
-    }
+    snakes.forEach((snake, index) => {
+        snake.update(time);
+        if(snake.isEatingFruit(self.fruit)) {
+            snake.addBodyPart();
+            self.fruit.destroy();
+            self.fruit = new Fruit(Phaser.Math.Between(0, xGridSize - 1), Phaser.Math.Between(0, yGridSize - 1), this);
+        }
+    });
 }
 
 //Get parameters from query string
