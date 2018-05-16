@@ -31,11 +31,6 @@ export default Phaser.Class({
     },
 
     update: function(time) {
-        // JK - was testing a function (removebodypart)
-        if(this.alive == false)
-        {
-            this.alive = true;
-        }
         if(time >= this.timeToNextMove) {
             this.move(time);
         }
